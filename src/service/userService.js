@@ -1,4 +1,5 @@
 const User = require("../models/user.models");
+const bcrypt = require("bcryptjs");
 
 const getUserService = async (req) => {
   try {
@@ -11,6 +12,7 @@ const getUserService = async (req) => {
       username,
       age: user.age,
       email: user.email,
+      password: user.password
     };
   } catch (err) {
     return { error: "Ocurrió un error al buscar el usuario", status: 500 };
@@ -19,7 +21,17 @@ const getUserService = async (req) => {
 const postUserService = async (req) => {
   try {
     const newUser = req.body;
-    await User.create(newUser);
+    //encriptar contraseñas
+    const encodedPassword = bcrypt.hashSync(newUser.password);
+
+    const newUserDB = new User({
+      username: newUser.username,
+      email: newUser.email,
+      age: newUser.age,
+      rol: newUser.rol,
+      password: encodedPassword,
+    });
+    await newUserDB.save();
     return { message: "Usuario creado con exito" };
   } catch (error) {
     if (error.code === 11000)

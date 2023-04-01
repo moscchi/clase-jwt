@@ -8,9 +8,9 @@ const {
 const { check } = require("express-validator");
 const repeatPasswordMiddleware = require("../utils/repeatPassword");
 const validator = require('../utils/validator');
+const validarToken = require("../utils/validarToken");
 const userRouter = express.Router();
 
-userRouter.get("/:username", getUserController);
 userRouter.post(
   "/",
   //Validamos los campos que ingresa el usuario:
@@ -23,11 +23,17 @@ userRouter.post(
     .withMessage("La contraseña debe tener al menos 8 caracteres")
     .matches(/\d/)
     .withMessage("La contraseña debe contener al menos un número"),
-  repeatPasswordMiddleware,
-  validator,
+    repeatPasswordMiddleware,
+    validator,
   postUserController
 );
 userRouter.put("/:username", putUserController);
 userRouter.delete("/:username", deleteUserController);
+
+userRouter.get('/saludar', validarToken, (req, res) => {
+  
+  res.send('Hola clase pude entrar :) ')
+})
+userRouter.get("/:username", getUserController);
 
 module.exports = { userRouter };
